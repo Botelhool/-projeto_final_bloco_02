@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import {DeleteResult ,ILike,Repository } from "typeorm";
 import { Categoria } from "../entities/categoria.entity";
-import { Produto } from "../../produto/entities/produto.entity";
+
 
 
 
@@ -47,7 +47,7 @@ export class CategoriaService{
 
 
    async update(categoria:Categoria):Promise<Categoria>{
-    console.log(categoria);
+    
     if (!categoria || !categoria.id) {
         throw new HttpException('Dados da categoria inválidos ou ID não informado!', HttpStatus.BAD_REQUEST);
     }
