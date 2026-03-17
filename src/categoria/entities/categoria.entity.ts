@@ -1,5 +1,5 @@
 import { Transform } from "class-transformer";
-import { IsNotEmpty, IsNumber, Length } from "class-validator";
+import { IsNotEmpty, IsNumber, IsOptional, Length } from "class-validator";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Produto } from "../../produto/entities/produto.entity";
 
@@ -9,6 +9,7 @@ export class Categoria{
 
     @PrimaryGeneratedColumn()
     @IsNumber()
+    @IsOptional()
     id:number;
 
 
