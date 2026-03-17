@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import {DeleteResult ,ILike,Repository } from "typeorm";
 import { Categoria } from "../entities/categoria.entity";
+import { Produto } from "../../produto/entities/produto.entity";
 
 
 
@@ -13,7 +14,12 @@ export class CategoriaService{
 
     //CRUD
     async findById(id:number):Promise <Categoria> {
-        const resultado = await this.categoriaRepository.findOne({where:{id}});
+        const resultado = await this.categoriaRepository.findOne({
+            where:{id},
+            relations:{
+                produto:true
+            }
+        });
         
         if(resultado === null){
             throw new HttpException('Categoria não encontrada!',HttpStatus.NOT_FOUND)
@@ -23,7 +29,7 @@ export class CategoriaService{
     }
     
     findAll():Promise<Categoria[]>{
-        return this.categoriaRepository.find({});
+        return this.categoriaRepository.find({relations:{produto:true}});
     }
 
 
@@ -40,13 +46,20 @@ export class CategoriaService{
     }
 
 
-   async upadate(categoria:Categoria):Promise<Categoria>{
-       
+   async update(categoria:Categoria):Promise<Categoria>{
+    console.log(categoria);
     if (!categoria || !categoria.id) {
         throw new HttpException('Dados da categoria inválidos ou ID não informado!', HttpStatus.BAD_REQUEST);
     }
+
+    const buscaCategoria = await this.findById(categoria.id);
+
+
+    if (!buscaCategoria) {
+        throw new HttpException('Categoria não encontrada!', HttpStatus.NOT_FOUND);
+    }
     
-        await this.findById(categoria.id);
+        
         return this.categoriaRepository.save(categoria);
     }
 

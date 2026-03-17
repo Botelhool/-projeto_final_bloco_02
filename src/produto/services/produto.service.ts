@@ -3,6 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { ILike, Repository } from "typeorm";
 import { DeleteResult } from "typeorm";
 import { Produto } from "../entities/produto.entity";
+import { CategoriaService } from "../../categoria/services/categoria.service";
 
 
 
@@ -10,7 +11,8 @@ import { Produto } from "../entities/produto.entity";
 export class ProdutoService {
 
     constructor(@InjectRepository(Produto)
-    private produtoRepository: Repository<Produto>,) { }
+    private produtoRepository: Repository<Produto>,
+    private readonly categoriaService: CategoriaService) { }
 
 
 
@@ -25,10 +27,10 @@ export class ProdutoService {
     }
 
     findAll(): Promise<Produto[]> {
-        return this.produtoRepository.find({});
+        return this.produtoRepository.find({relations:{categoria:true}});
     }
 
-    
+
 
     async findByDescricao(descricao: string): Promise<Produto[]> {
         return await this.produtoRepository.find({
@@ -39,18 +41,31 @@ export class ProdutoService {
     }
 
 
-    async create(produto: Produto): Promise<Produto> {
-        const buscaProduto = await this.produtoRepository.findOne({
-            where:
-                { nome: produto.nome }
-        });
+   async create(produto: Produto): Promise<Produto> {
+    console.log("Dados recebidos no POST:", produto)
+    const buscaProduto = await this.produtoRepository.findOne({
+        where: { nome: produto.nome }
+    });
 
-        if (buscaProduto)
-            throw new HttpException('Produto já existe!', HttpStatus.BAD_REQUEST);
-
-
-        return this.produtoRepository.save(produto);
+    if (buscaProduto) {
+        throw new HttpException('Produto já existe!', HttpStatus.BAD_REQUEST);
     }
+
+   
+    if (produto.categoria && produto.categoria.id) {
+        const buscaCategoria = await this.categoriaService.findById(produto.categoria.id);
+
+        if (!buscaCategoria) {
+            throw new HttpException('Categoria não encontrada!', HttpStatus.NOT_FOUND);
+        }
+
+       
+        return await this.produtoRepository.save(produto);
+    }
+
+    
+    throw new HttpException('A categoria é obrigatória!', HttpStatus.BAD_REQUEST);
+}
 
 
 

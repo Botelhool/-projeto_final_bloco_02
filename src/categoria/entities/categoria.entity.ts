@@ -1,12 +1,14 @@
 import { Transform } from "class-transformer";
-import { IsNotEmpty, Length } from "class-validator";
+import { IsNotEmpty, IsNumber, Length } from "class-validator";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Produto } from "../../produto/entities/produto.entity";
 
 
 @Entity('tb_categorias')
 export class Categoria{
 
     @PrimaryGeneratedColumn()
+    @IsNumber()
     id:number;
 
 
@@ -17,6 +19,9 @@ export class Categoria{
     nome:string;
 
 
+    @OneToMany(() => Produto, (produto) => produto.categoria)
+    produto: Produto[];
+    
 
 
 }

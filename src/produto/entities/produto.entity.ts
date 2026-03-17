@@ -1,6 +1,7 @@
 import { Transform, Type } from "class-transformer";
-import { IsNotEmpty, IsNumber, IsOptional, IsUrl, Length,Min, MinDate } from "class-validator";
-import { Column, Entity, PrimaryGeneratedColumn, ValueTransformer } from "typeorm";
+import { IsDefined, IsNotEmpty, IsNumber, IsObject, IsOptional, IsUrl, Length, Min, MinDate } from "class-validator";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, ValueTransformer } from "typeorm";
+import { Categoria } from "../../categoria/entities/categoria.entity";
 
 // Definição do NumericTransformer
 class NumericTransformer implements ValueTransformer {
@@ -31,7 +32,7 @@ export class Produto {
     @Type(() => Number)
     preco: number;
 
-    @Column( {type:'date', nullable: true })
+    @Column({ type: 'date', nullable: true })
     @Type(() => Date)
     @IsNotEmpty({ message: 'A data de validade do produto é obrigatória!' })
     @MinDate(new Date(), { message: 'A data não pode ser retroativa' })
@@ -40,11 +41,20 @@ export class Produto {
     @Column('int', { nullable: true, default: 0 })
     @Min(0, { message: 'A quantidade não pode ser negativa' })
     @Transform(({ value }) => parseInt(value, 10))
-    
+
     quantidade: number;
 
     @Column('varchar', { length: 1000, nullable: true })
     @IsOptional()
     @IsUrl({}, { message: 'A URL da imagem deve ser válida' })
     imgUrl: string;
+
+    @IsDefined()
+    @IsObject()
+    @IsNotEmpty({ message: 'A categoria do produto é obrigatória!' })
+    @ManyToOne(() => Categoria, (categoria) => categoria.produto, {
+        onDelete: 'CASCADE'
+    })
+
+    categoria: Categoria;
 }

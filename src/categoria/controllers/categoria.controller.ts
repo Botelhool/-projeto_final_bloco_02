@@ -38,8 +38,8 @@ export class CategoriaController {
 
     @Put()
     @HttpCode(HttpStatus.OK)
-    async upadate(@Body()categoria: Categoria): Promise<Categoria> {
-        return await this.categoriaService.upadate(categoria);
+    async update(@Body()categoria: Categoria): Promise<Categoria> {
+        return await this.categoriaService.update(categoria);
     }
 
     @Delete('/:id')
